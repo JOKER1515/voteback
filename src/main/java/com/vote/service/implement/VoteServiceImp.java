@@ -195,4 +195,38 @@ public class VoteServiceImp extends ServiceImpl<VoteMapper, Vote> implements Vot
     queryWrapper.orderByDesc("account");
     return voteMapper.selectList(queryWrapper);
   }
+
+  @Override
+  public boolean stopVote(String title, String username) {
+    Map<String,Object> map = new HashMap<>();
+    map.put("title",title);
+    map.put("user_id",username);
+    List<Vote> voteList = voteMapper.selectByMap(map);
+    for (Vote vote: voteList) {
+        if(vote.getState()==0){
+          vote.setState(1);
+          voteMapper.updateById(vote);
+          return true;
+        }else {
+          vote.setState(0);
+          voteMapper.updateById(vote);
+
+        }
+    }
+    return false;
+  }
+
+  @Override
+  public boolean isStop(String title, String creatorId) {
+    Map<String,Object> map = new HashMap<>();
+    map.put("title",title);
+    map.put("user_id",creatorId);
+    List<Vote> voteList = voteMapper.selectByMap(map);
+    for (Vote vote : voteList) {
+        if(vote.getState()==1){
+          return true;
+        }
+    }
+    return false;
+  }
 }

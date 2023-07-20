@@ -32,6 +32,13 @@ public class VoteController {
     return Result.success(voteList);
   }
 
+  /** 删除我发起的投 */
+  @DeleteMapping
+  public Result deleteVote(String title, String userId) {
+    voteService.deleteVote(title, userId);
+    return Result.success();
+  }
+
   /** 模糊查询 */
   @GetMapping("/search")
   public Result search(String content) {
@@ -65,11 +72,17 @@ public class VoteController {
   /** 参与投票 */
   @GetMapping("/participate")
   public Result participate(String username, int number, String title, String creatorId) {
-    if (!participateService.isVoteAlready(username, title, creatorId)) {
-      voteService.participate(username, number, title, creatorId);
-      return Result.success();
+    if (!voteService.isStop(title, creatorId)) {
+
+      if (!participateService.isVoteAlready(username, title, creatorId)) {
+        voteService.participate(username, number, title, creatorId);
+        return Result.success();
+      }
+      return Result.error("请勿多次投票");
+
+    } else {
+      return Result.error("投票已被暂停");
     }
-    return Result.error("请勿多次投票");
   }
 
   /** 获取我发起的投票的信息 */
@@ -77,13 +90,6 @@ public class VoteController {
   public Result myVote(String id) {
     List<Vote> voteList = voteService.getMyVote(id);
     return Result.success(voteList);
-  }
-
-  /** 删除我发起的投 */
-  @DeleteMapping
-  public Result deleteVote(String title, String userId) {
-    voteService.deleteVote(title, userId);
-    return Result.success();
   }
 
   /** 查询我参与的投票 */
@@ -124,13 +130,20 @@ public class VoteController {
     return Result.error("没有参与投票，无法查看投票结果");
   }
 
-  /**
-   * 按热度排序
-   */
+  /** 按热度排序 */
   @GetMapping("/sortHot")
-  public Result sortHot(){
+  public Result sortHot() {
     List<Vote> voteList = voteService.sortByHot();
     return Result.success(voteList);
   }
 
+  /** 暂停投票 */
+  @GetMapping("/stop")
+  public Result stopVote(String title, String username) {
+    boolean StartToStop = voteService.stopVote(title, username);
+    if (StartToStop) {
+      return Result.success();
+    }
+    return Result.error("");
+  }
 }

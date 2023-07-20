@@ -30,7 +30,11 @@ public interface VoteService extends IService<Vote> {
 
   void updateMyVote(Vote vote);
 
-    String choiceCount(String title, String creatorId);
+  String choiceCount(String title, String creatorId);
 
   List<Vote> sortByHot();
+
+  boolean stopVote(String title, String username);
+
+  boolean isStop(String title, String creatorId);
 }

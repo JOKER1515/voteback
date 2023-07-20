@@ -16,4 +16,5 @@ public class Vote {
   private String choice;
   private LocalDate createTime;
   private Integer account;
+  private Integer state;
 }
